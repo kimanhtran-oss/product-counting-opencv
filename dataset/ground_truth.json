@@ -1,0 +1,13 @@
+{
+  "_ghi_chu": "so_thuc_te: số vật đếm bằng mắt. tham_so: bộ tham số đã chỉnh để đếm đúng (bỏ trống = dùng mặc định). Tên khóa giống tham số của hàm dem_san_pham().",
+  "banh.jpg":              { "so_thuc_te": 9,  "tham_so": {} },
+  "ca.jpg":                { "so_thuc_te": 3,  "tham_so": {} },
+  "chucai.jpg":            { "so_thuc_te": 25, "tham_so": {} },
+  "cucao.jpg":             { "so_thuc_te": 32, "tham_so": { "min_area": 1000, "phep_toan": "Closing" } },
+  "dongxu_7.jpg":          { "so_thuc_te": 7,  "tham_so": { "k": 9, "phep_toan": "Closing" } },
+  "hanhnhan_6.jpg":        { "so_thuc_te": 6,  "tham_so": { "min_area": 2000 } },
+  "keo_29.jpg":            { "so_thuc_te": 29, "tham_so": { "min_area": 1000 } },
+  "tomato.jpg":            { "so_thuc_te": 2,  "tham_so": {} },
+  "tonghop_nentoi_12.jpg": { "so_thuc_te": 12, "tham_so": { "vat_sang": true } },
+  "traitim_5.jpg":         { "so_thuc_te": 5,  "tham_so": {} }
+}
