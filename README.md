@@ -16,7 +16,7 @@
 
 </div>
 
-![Giao diện chương trình](images\giao_dien.png)
+![Giao diện chương trình](images/giao_dien.png)
 
 ![Pipeline xử lý trên ảnh đồng xu](images/pipeline.png)
 
