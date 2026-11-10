@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from PIL import Image, ImageTk
 
-from modules.count import doc_anh, ghi_anh, dem_san_pham, thong_ke
+from modules.count import doc_anh, ghi_anh, dem_san_pham, thong_ke, kiem_tra_file
 
 # Thư mục chứa file code: dataset luôn tìm theo đường dẫn này, chạy từ thư mục nào cũng được
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -249,8 +249,13 @@ class DemSanPhamApp:
             self.doc_va_hien_thi_file(path)
 
     def doc_va_hien_thi_file(self, path):
-        ext = path.lower()
-        if ext.endswith(('.mp4', '.avi', '.mov')):
+        # Kiểm tra file trước khi đọc (magic bytes, dung lượng, kích thước ảnh)
+        hop_le, loai, loi = kiem_tra_file(path)
+        if not hop_le:
+            messagebox.showerror("File không hợp lệ", f"{os.path.basename(path)}\n\n{loi}")
+            return
+
+        if loai in ("mp4", "avi"):
             # Video: lấy khung hình đầu tiên để xử lý
             cap = cv2.VideoCapture(path)
             ret, frame = cap.read()

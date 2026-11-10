@@ -38,3 +38,16 @@ jobs:
         run: pip install bandit
       - name: Quét code Python
         run: bandit -r . -ll
+
+  tests:
+    name: Kiểm thử kiểm tra file đầu vào
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Cài thư viện
+        run: pip install opencv-python-headless numpy pillow
+      - name: Chạy test
+        run: python -m unittest discover tests -v

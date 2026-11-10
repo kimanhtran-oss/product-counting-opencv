@@ -1,6 +1,77 @@
 import os
 import cv2
 import numpy as np
+from PIL import Image
+
+
+# ---------------- KIỂM TRA FILE ĐẦU VÀO (BẢO MẬT) ----------------
+# Không tin vào đuôi file: đọc vài byte đầu (magic bytes) để biết file thật sự là gì.
+CHU_KY_ANH = {
+    b"\x89PNG\r\n\x1a\n": "png",
+    b"\xff\xd8\xff": "jpg",
+    b"BM": "bmp",
+    b"II*\x00": "tif",
+    b"MM\x00*": "tif",
+}
+DUOI_HOP_LE = {
+    "png": (".png",), "jpg": (".jpg", ".jpeg"), "bmp": (".bmp",), "tif": (".tif", ".tiff"),
+    "mp4": (".mp4", ".mov"), "avi": (".avi",),
+}
+MAX_DUNG_LUONG_ANH = 50 * 1024 * 1024       # 50 MB
+MAX_DUNG_LUONG_VIDEO = 500 * 1024 * 1024    # 500 MB
+MAX_SO_DIEM_ANH = 50_000_000                # 50 triệu điểm ảnh (~ 8000 x 6000)
+
+
+def nhan_dang_file(dau_file):
+    # Trả về loại file dựa trên magic bytes, không khớp thì trả về None
+    for chu_ky, loai in CHU_KY_ANH.items():
+        if dau_file.startswith(chu_ky):
+            return loai
+    if dau_file[4:8] in (b"ftyp", b"moov", b"mdat", b"wide", b"free"):
+        return "mp4"
+    if dau_file[:4] == b"RIFF" and dau_file[8:12] == b"AVI ":
+        return "avi"
+    return None
+
+
+def kiem_tra_file(path):
+    # Kiểm tra file trước khi đưa cho OpenCV xử lý.
+    # Trả về (hợp lệ, loại file, thông báo lỗi)
+    if not os.path.isfile(path):
+        return False, None, "File không tồn tại."
+    dung_luong = os.path.getsize(path)
+    if dung_luong == 0:
+        return False, None, "File rỗng."
+
+    with open(path, "rb") as f:
+        dau_file = f.read(16)
+    loai = nhan_dang_file(dau_file)
+    if loai is None:
+        return False, None, "Nội dung file không phải ảnh/video được hỗ trợ."
+
+    duoi = os.path.splitext(path)[1].lower()
+    if duoi not in DUOI_HOP_LE[loai]:
+        return False, loai, f"Đuôi file {duoi} không khớp với nội dung thật ({loai})."
+
+    la_video = loai in ("mp4", "avi")
+    gioi_han = MAX_DUNG_LUONG_VIDEO if la_video else MAX_DUNG_LUONG_ANH
+    if dung_luong > gioi_han:
+        return False, loai, f"File quá lớn (giới hạn {gioi_han // (1024 * 1024)} MB)."
+
+    if not la_video:
+        # Đọc kích thước từ phần đầu file, chưa giải nén ảnh,
+        # để chặn "decompression bomb" (file nhỏ nhưng giải nén ra cực lớn)
+        try:
+            with Image.open(path) as im:
+                rong, cao = im.size
+        except Image.DecompressionBombError:
+            return False, loai, "Ảnh quá lớn, nghi là decompression bomb."
+        except Exception:
+            return False, loai, "File ảnh bị hỏng hoặc không đọc được."
+        if rong * cao > MAX_SO_DIEM_ANH:
+            return False, loai, f"Ảnh quá lớn ({rong} x {cao} điểm ảnh)."
+
+    return True, loai, ""
 
 
 def doc_anh(path):
