@@ -1,0 +1,40 @@
+name: Security scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 2 * * 1"   # 9h sáng thứ Hai hằng tuần (giờ Việt Nam)
+  workflow_dispatch:       # cho phép bấm chạy tay trên GitHub
+
+# Chỉ cấp quyền đọc, đúng nguyên tắc "quyền tối thiểu"
+permissions:
+  contents: read
+
+jobs:
+  pip-audit:
+    name: Kiểm tra lỗ hổng thư viện (pip-audit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Cài pip-audit
+        run: pip install pip-audit
+      - name: Quét requirements.txt
+        run: pip-audit -r requirements.txt --desc
+
+  bandit:
+    name: Phân tích mã tĩnh (Bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Cài Bandit
+        run: pip install bandit
+      - name: Quét code Python
+        run: bandit -r . -ll

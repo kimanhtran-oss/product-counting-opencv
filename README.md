@@ -9,6 +9,7 @@
 ![NumPy](https://img.shields.io/badge/NumPy-013243?logo=numpy&logoColor=white)
 ![Tkinter](https://img.shields.io/badge/GUI-Tkinter-FFB000)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![Security scan](https://github.com/kimanhtran-oss/product-counting-opencv/actions/workflows/security.yml/badge.svg)
 
 Đồ án môn **Xử lý ảnh số** · Chủ đề 4, Project 2 · Nhóm 01
 
