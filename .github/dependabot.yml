@@ -1,0 +1,18 @@
+# Dependabot: tự kiểm tra và đề xuất nâng cấp thư viện mỗi tuần
+version: 2
+updates:
+  # Thư viện Python trong requirements.txt
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+
+  # Các action dùng trong GitHub Actions (cho workflow ở bước 3)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
