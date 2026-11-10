@@ -78,22 +78,32 @@ python count_gui.py
 # Đánh giá trên toàn bộ dataset, in bảng kết quả
 python evaluate.py
 python evaluate.py --save results   # lưu thêm ảnh kết quả
+
+# Chạy kiểm thử bảo mật
+python -m unittest discover tests -v
 ```
 
 ## Cấu trúc thư mục
 
 ```
 product-counting-opencv/
+├── .github/
+│   ├── dependabot.yml        # Tự kiểm tra cập nhật thư viện
+│   └── workflows/
+│       └── security.yml      # CI: pip-audit, Bandit, kiểm thử
 ├── count_gui.py              # Giao diện Tkinter
 ├── evaluate.py               # Đánh giá độ chính xác trên dataset
 ├── modules/
-│   └── count.py              # Thuật toán: Otsu, Morphology, Connected Components, thống kê
+│   └── count.py              # Thuật toán và kiểm tra file đầu vào
+├── tests/
+│   └── test_kiem_tra_file.py # Kiểm thử bảo mật cho file đầu vào
 ├── dataset/
 │   ├── *.jpg                 # 10 ảnh thử nghiệm
-│   └── ground_truth.json     # Số thực tế và bộ tham số đã chỉnh cho từng ảnh
+│   └── ground_truth.json     # Số thực tế và bộ tham số đã chỉnh
 ├── images/                   # Ảnh minh họa cho README
 ├── docs/
 │   └── XLA_Nhom01.pdf        # Slide thuyết trình
+├── SECURITY.md               # Chính sách bảo mật
 └── requirements.txt
 ```
 
@@ -137,6 +147,21 @@ Bảng dưới được tạo bằng `python evaluate.py`. Cột **Mặc định
 | Cả ảnh chỉ ra 1 vùng                     | Đảo chế độ Vật sáng hơn nền              |
 
 ![Kết quả trên toàn bộ dataset](images/ket_qua_dataset.png)
+
+## Bảo mật
+
+Ứng dụng mở file ảnh/video do người dùng chọn, nên file đầu vào được coi là dữ liệu không tin cậy. Repo áp dụng các biện pháp sau:
+
+| Biện pháp | Công cụ |
+|---|---|
+| Kiểm tra magic bytes, đuôi file, dung lượng và kích thước ảnh trước khi xử lý (chống file giả mạo và decompression bomb) | `kiem_tra_file()` trong `modules/count.py` |
+| Kiểm thử tự động các trường hợp file độc hại giả lập | `tests/test_kiem_tra_file.py` |
+| Quét lỗ hổng thư viện (CVE) mỗi lần push và hằng tuần | `pip-audit`, Dependabot |
+| Phân tích mã tĩnh tìm lỗi bảo mật | CodeQL, Bandit |
+| Phát hiện khóa bí mật bị commit nhầm | GitHub Secret scanning |
+| Workflow CI chỉ cấp quyền đọc (nguyên tắc quyền tối thiểu) | GitHub Actions |
+
+Mô hình đe dọa chi tiết và cách báo cáo lỗ hổng: xem [SECURITY.md](SECURITY.md).
 
 ## Hạn chế và hướng phát triển
 
